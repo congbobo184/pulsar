@@ -67,7 +67,7 @@ public class MLTransactionLogImpl implements TransactionLog {
     public MLTransactionLogImpl(TransactionCoordinatorID tcID,
                                 ManagedLedgerFactory managedLedgerFactory,
                                 ManagedLedgerConfig managedLedgerConfig) throws Exception {
-        this.topicName = TRANSACTION_LOG_PREFIX + tcID;
+        this.topicName = TRANSACTION_LOG_PREFIX + tcID.getId();
         this.tcId = tcID.getId();
         this.mlTransactionLogInterceptor = new MLTransactionLogInterceptor();
         managedLedgerConfig.setManagedLedgerInterceptor(this.mlTransactionLogInterceptor);
