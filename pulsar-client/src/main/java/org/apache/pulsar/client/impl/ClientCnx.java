@@ -98,7 +98,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings("unchecked")
-public class ClientCnx extends PulsarHandler {
+public class
+ClientCnx extends PulsarHandler {
 
     protected final Authentication authentication;
     private State state;
@@ -1076,8 +1077,7 @@ public class ClientCnx extends PulsarHandler {
         this.remoteHostName = remoteHostName;
     }
 
-
-    private PulsarClientException getPulsarClientException(ServerError error, String errorMsg) {
+    public static PulsarClientException getPulsarClientException(ServerError error, String errorMsg) {
         switch (error) {
         case AuthenticationError:
             return new PulsarClientException.AuthenticationException(errorMsg);
