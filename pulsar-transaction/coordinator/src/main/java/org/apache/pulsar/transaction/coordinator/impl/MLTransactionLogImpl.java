@@ -198,7 +198,6 @@ public class MLTransactionLogImpl implements TransactionLog {
                     if (entry != null) {
                         TransactionMetadataEntry lastConfirmEntry = new TransactionMetadataEntry();
                         ByteBuf buffer = entry.getDataBuffer();
-                        currentLoadPosition = PositionImpl.get(entry.getLedgerId(), entry.getEntryId());
                         lastConfirmEntry.parseFrom(buffer, buffer.readableBytes());
                         completableFuture.complete(lastConfirmEntry.getMaxLocalTxnId());
                     } else if (managedLedger.getProperties()

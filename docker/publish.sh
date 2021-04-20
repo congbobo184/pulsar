@@ -21,6 +21,9 @@
 ROOT_DIR=$(git rev-parse --show-toplevel)
 cd $ROOT_DIR/docker
 
+DOCKER_USER=congbobo184
+
+DOCKER_PASSWORD=Vw9BZ7pYH3Hjexz
 # We should only publish images that are made from official and approved releases
 # and thus ignore all the release candidates that are just tagged during the release
 # process
@@ -39,7 +42,7 @@ if [ -z "$DOCKER_PASSWORD" ]; then
     exit 1
 fi
 
-DOCKER_ORG="${DOCKER_ORG:-apachepulsar}"
+DOCKER_ORG="${DOCKER_ORG:-congbobo184}"
 
 docker login ${DOCKER_REGISTRY} -u="$DOCKER_USER" -p="$DOCKER_PASSWORD"
 if [ $? -ne 0 ]; then
@@ -63,27 +66,27 @@ set -x
 set -e
 
 docker tag pulsar:latest ${docker_registry_org}/pulsar:latest
-docker tag pulsar-all:latest ${docker_registry_org}/pulsar-all:latest
-docker tag pulsar-grafana:latest ${docker_registry_org}/pulsar-grafana:latest
-docker tag pulsar-dashboard:latest ${docker_registry_org}/pulsar-dashboard:latest
-docker tag pulsar-standalone:latest ${docker_registry_org}/pulsar-standalone:latest
+#docker tag pulsar-all:latest ${docker_registry_org}/pulsar-all:latest
+#docker tag pulsar-grafana:latest ${docker_registry_org}/pulsar-grafana:latest
+#docker tag pulsar-dashboard:latest ${docker_registry_org}/pulsar-dashboard:latest
+#docker tag pulsar-standalone:latest ${docker_registry_org}/pulsar-standalone:latest
 
-docker tag pulsar:latest ${docker_registry_org}/pulsar:$MVN_VERSION
-docker tag pulsar-all:latest ${docker_registry_org}/pulsar-all:$MVN_VERSION
-docker tag pulsar-grafana:latest ${docker_registry_org}/pulsar-grafana:$MVN_VERSION
-docker tag pulsar-dashboard:latest ${docker_registry_org}/pulsar-dashboard:$MVN_VERSION
-docker tag pulsar-standalone:latest ${docker_registry_org}/pulsar-standalone:$MVN_VERSION
+#docker tag pulsar:latest ${docker_registry_org}/pulsar:$MVN_VERSION
+#docker tag pulsar-all:latest ${docker_registry_org}/pulsar-all:$MVN_VERSION
+#docker tag pulsar-grafana:latest ${docker_registry_org}/pulsar-grafana:$MVN_VERSION
+#docker tag pulsar-dashboard:latest ${docker_registry_org}/pulsar-dashboard:$MVN_VERSION
+#docker tag pulsar-standalone:latest ${docker_registry_org}/pulsar-standalone:$MVN_VERSION
 
 # Push all images and tags
 docker push ${docker_registry_org}/pulsar:latest
-docker push ${docker_registry_org}/pulsar-all:latest
-docker push ${docker_registry_org}/pulsar-grafana:latest
-docker push ${docker_registry_org}/pulsar-dashboard:latest
-docker push ${docker_registry_org}/pulsar-standalone:latest
-docker push ${docker_registry_org}/pulsar:$MVN_VERSION
-docker push ${docker_registry_org}/pulsar-all:$MVN_VERSION
-docker push ${docker_registry_org}/pulsar-grafana:$MVN_VERSION
-docker push ${docker_registry_org}/pulsar-dashboard:$MVN_VERSION
-docker push ${docker_registry_org}/pulsar-standalone:$MVN_VERSION
+#docker push ${docker_registry_org}/pulsar-all:latest
+#docker push ${docker_registry_org}/pulsar-grafana:latest
+#docker push ${docker_registry_org}/pulsar-dashboard:latest
+#docker push ${docker_registry_org}/pulsar-standalone:latest
+#docker push ${docker_registry_org}/pulsar:$MVN_VERSION
+#docker push ${docker_registry_org}/pulsar-all:$MVN_VERSION
+#docker push ${docker_registry_org}/pulsar-grafana:$MVN_VERSION
+#docker push ${docker_registry_org}/pulsar-dashboard:$MVN_VERSION
+#docker push ${docker_registry_org}/pulsar-standalone:$MVN_VERSION
 
 echo "Finished pushing images to ${docker_registry_org}"

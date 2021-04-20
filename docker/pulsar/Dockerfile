@@ -34,7 +34,7 @@ COPY scripts/pulsar-zookeeper-ruok.sh /pulsar/bin
 COPY scripts/watch-znode.py /pulsar/bin
 COPY scripts/install-pulsar-client-37.sh /pulsar/bin
 
-COPY target/python-client/ /pulsar/pulsar-client
+#COPY target/python-client/ /pulsar/pulsar-client
 
 RUN mkdir /pulsar/data
 
@@ -80,7 +80,7 @@ WORKDIR /pulsar
 
 # This script is intentionally run as the root user to make the dependencies
 # available to the root user and the pulsar user
-RUN /pulsar/bin/install-pulsar-client-37.sh
+#RUN /pulsar/bin/install-pulsar-client-37.sh
 
 # Switch to the pulsar user to ensure container defaults to run as a non root user
 USER pulsar
