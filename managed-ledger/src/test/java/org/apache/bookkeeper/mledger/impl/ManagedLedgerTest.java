@@ -1351,6 +1351,7 @@ public class ManagedLedgerTest extends MockedBookKeeperTestCase {
     public void ledgersList() throws Exception {
         MetaStore store = factory.getMetaStore();
 
+        
         assertEquals(Sets.newHashSet(store.getManagedLedgers()), Sets.newHashSet());
         ManagedLedger ledger1 = factory.open("ledger1");
         assertEquals(Sets.newHashSet(store.getManagedLedgers()), Sets.newHashSet("ledger1"));
