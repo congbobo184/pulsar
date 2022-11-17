@@ -16,20 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.pulsar.common.policies.data;
+package org.apache.bookkeeper.mledger.impl.cache;
+
+import java.util.List;
 
 /**
- * Inactive topic deletion mode.
+ * Cache eviction policy abstraction interface.
+ *
  */
-public enum InactiveTopicDeleteMode {
-
+public interface EntryCacheEvictionPolicy {
     /**
-     * The topic can be deleted when no subscriptions and no active producers.
+     * Perform the cache eviction of at least sizeToFree bytes on the supplied list of caches.
+     *
+     * @param caches
+     *            the list of caches to consider
+     * @param sizeToFree
+     *            the minimum size in bytes to be freed
      */
-    delete_when_no_subscriptions,
-
-    /**
-     * The topic can be deleted when all subscriptions catchup and no active producers.
-     */
-    delete_when_subscriptions_caught_up
+    void doEviction(List<EntryCache> caches, long sizeToFree);
 }

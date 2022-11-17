@@ -24,6 +24,7 @@ import com.google.common.collect.Sets;
 import io.netty.util.internal.PlatformDependent;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
@@ -1057,6 +1058,11 @@ public class ServiceConfiguration implements PulsarConfiguration {
     private boolean disableBrokerInterceptors = true;
 
     @FieldContext(
+            category = CATEGORY_SERVER,
+            doc = "List of interceptors for payload processing.")
+    private Set<String> brokerEntryPayloadProcessors = new LinkedHashSet<>();
+
+    @FieldContext(
         doc = "There are two policies to apply when broker metadata session expires: session expired happens, \"shutdown\" or \"reconnect\". \n\n"
         + " With \"shutdown\", the broker will be restarted.\n\n"
         + " With \"reconnect\", the broker will keep serving the topics, while attempting to recreate a new session."
@@ -1539,6 +1545,7 @@ public class ServiceConfiguration implements PulsarConfiguration {
     private int managedLedgerMaxAckQuorum = 5;
     @FieldContext(
         category = CATEGORY_STORAGE_ML,
+        dynamic = true,
         doc = "Amount of memory to use for caching data payload in managed ledger. \n\nThis"
             + " memory is allocated from JVM direct memory and it's shared across all the topics"
             + " running in the same broker. By default, uses 1/5th of available direct memory")
@@ -1548,6 +1555,7 @@ public class ServiceConfiguration implements PulsarConfiguration {
     private boolean managedLedgerCacheCopyEntries = false;
     @FieldContext(
         category = CATEGORY_STORAGE_ML,
+        dynamic = true,
         doc = "Threshold to which bring down the cache level when eviction is triggered"
     )
     private double managedLedgerCacheEvictionWatermark = 0.9f;
@@ -1555,6 +1563,7 @@ public class ServiceConfiguration implements PulsarConfiguration {
             doc = "Configure the cache eviction frequency for the managed ledger cache. Default is 100/s")
     private double managedLedgerCacheEvictionFrequency = 100.0;
     @FieldContext(category = CATEGORY_STORAGE_ML,
+            dynamic = true,
             doc = "All entries that have stayed in cache for more than the configured time, will be evicted")
     private long managedLedgerCacheEvictionTimeThresholdMillis = 1000;
     @FieldContext(category = CATEGORY_STORAGE_ML,
@@ -2224,8 +2233,14 @@ public class ServiceConfiguration implements PulsarConfiguration {
             doc = "Maximum prefetch rounds for ledger reading for offloading"
     )
     private int managedLedgerOffloadPrefetchRounds = 1;
+    @FieldContext(
+            category = CATEGORY_STORAGE_ML,
+            doc = "Evicting cache data by the slowest markDeletedPosition or readPosition. "
+                    + "The default is to evict through readPosition."
+    )
+    private boolean cacheEvictionByMarkDeletedPosition = false;
 
-    /**** --- Transaction config variables --- ****/
+    /**** --- Transaction config variables. --- ****/
     @FieldContext(
             category = CATEGORY_TRANSACTION,
             doc = "Enable transaction coordinator in broker"

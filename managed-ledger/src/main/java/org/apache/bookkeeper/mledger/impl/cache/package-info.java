@@ -16,20 +16,4 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.pulsar.common.policies.data;
-
-/**
- * Inactive topic deletion mode.
- */
-public enum InactiveTopicDeleteMode {
-
-    /**
-     * The topic can be deleted when no subscriptions and no active producers.
-     */
-    delete_when_no_subscriptions,
-
-    /**
-     * The topic can be deleted when all subscriptions catchup and no active producers.
-     */
-    delete_when_subscriptions_caught_up
-}
+package org.apache.bookkeeper.mledger.impl.cache;
