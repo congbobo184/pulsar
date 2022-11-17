@@ -19,7 +19,6 @@
 package org.apache.bookkeeper.mledger.impl.cache;
 
 import static org.apache.bookkeeper.mledger.util.SafeRun.safeRun;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
@@ -142,10 +141,12 @@ public class RangeEntryCacheManagerImpl implements EntryCacheManager {
     }
 
     void entryAdded(long size) {
+        mlFactoryMBean.recordCacheInsertion();
         currentSize.addAndGet(size);
     }
 
-    void entriesRemoved(long size) {
+    void entriesRemoved(long size, int count) {
+        mlFactoryMBean.recordNumberOfCacheEntriesEvicted(count);
         currentSize.addAndGet(-size);
     }
 
