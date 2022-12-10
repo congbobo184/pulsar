@@ -138,6 +138,7 @@ public class PendingAckHandleImpl extends PendingAckHandleState implements Pendi
                 .getTransactionExecutorProvider()
                 .getExecutor(this);
 
+
         this.pendingAckStoreProvider = this.persistentSubscription.getTopic()
                         .getBrokerService().getPulsar().getTransactionPendingAckStoreProvider();
         pendingAckStoreProvider.checkInitializedBefore(persistentSubscription).thenAccept(init -> {
