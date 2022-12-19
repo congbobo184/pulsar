@@ -215,6 +215,7 @@ public class MessageIdCompareToTest  {
         MultiMessageIdImpl item2 = new MultiMessageIdImpl(Collections.singletonMap(topic1, messageIdImpl2));
         assertEquals(item1, item2);
 
+
         // 1 item, empty not equal
         assertNotEquals(item1, null1);
         assertNotEquals(null1, item1);
