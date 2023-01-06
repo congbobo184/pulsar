@@ -141,13 +141,22 @@ public class PendingAckHandleImpl extends PendingAckHandleState implements Pendi
 
         this.pendingAckStoreProvider = this.persistentSubscription.getTopic()
                         .getBrokerService().getPulsar().getTransactionPendingAckStoreProvider();
-        pendingAckStoreProvider.checkInitializedBefore(persistentSubscription).thenAccept(init -> {
-            if (init) {
-                initPendingAckStore();
-            } else {
-                completeHandleFuture();
-            }
-        });
+
+        pendingAckStoreProvider.checkInitializedBefore(persistentSubscription)
+                .thenAcceptAsync(init -> {
+                    if (init) {
+                        initPendingAckStore();
+                    } else {
+                        completeHandleFuture();
+                    }
+                }, internalPinnedExecutor)
+                .exceptionally(e -> {
+                    Throwable t = FutureUtil.unwrapCompletionException(e);
+                    changeToErrorState();
+                    exceptionHandleFuture(t);
+                    this.pendingAckStoreFuture.completeExceptionally(t);
+                    return null;
+                });
     }
 
     private void initPendingAckStore() {
@@ -157,13 +166,13 @@ public class PendingAckHandleImpl extends PendingAckHandleState implements Pendi
                         pendingAckStoreProvider.newPendingAckStore(persistentSubscription);
                 this.pendingAckStoreFuture.thenAccept(pendingAckStore -> {
                     pendingAckStore.replayAsync(this, internalPinnedExecutor);
-                }).exceptionally(e -> {
-                    acceptQueue.clear();
+                }).exceptionally((e -> {
+                    handleCacheRequest();
                     changeToErrorState();
                     log.error("PendingAckHandleImpl init fail! TopicName : {}, SubName: {}", topicName, subName, e);
                     exceptionHandleFuture(e.getCause());
                     return null;
-                });
+                }));
             }
         }
     }
@@ -898,16 +907,12 @@ public class PendingAckHandleImpl extends PendingAckHandleState implements Pendi
         return transactionPendingAckStats;
     }
 
-    public synchronized void completeHandleFuture() {
-        if (!this.pendingAckHandleCompletableFuture.isDone()) {
-            this.pendingAckHandleCompletableFuture.complete(PendingAckHandleImpl.this);
-        }
+    public void completeHandleFuture() {
+        this.pendingAckHandleCompletableFuture.complete(PendingAckHandleImpl.this);
     }
 
-    public synchronized void exceptionHandleFuture(Throwable t) {
-        if (!this.pendingAckHandleCompletableFuture.isDone()) {
-            this.pendingAckHandleCompletableFuture.completeExceptionally(t);
-        }
+    public void exceptionHandleFuture(Throwable t) {
+        this.pendingAckHandleCompletableFuture.completeExceptionally(t);
     }
 
     @Override
@@ -932,11 +937,29 @@ public class PendingAckHandleImpl extends PendingAckHandleState implements Pendi
     }
 
     @Override
-    public CompletableFuture<Void> close() {
+    public CompletableFuture<Void> closeAsync() {
         changeToCloseState();
         synchronized (PendingAckHandleImpl.this) {
             if (this.pendingAckStoreFuture != null) {
-                return this.pendingAckStoreFuture.thenAccept(PendingAckStore::closeAsync);
+                CompletableFuture<Void> closeFuture = new CompletableFuture<>();
+                this.pendingAckStoreFuture.whenComplete((pendingAckStore, e) -> {
+                    if (e != null) {
+                        // init pending ack store fail, close don't need to
+                        // retry and throw exception, complete directly
+                        closeFuture.complete(null);
+                    } else {
+                        pendingAckStore.closeAsync().whenComplete((q, ex) -> {
+                            if (ex != null) {
+                                Throwable t = FutureUtil.unwrapCompletionException(ex);
+                                closeFuture.completeExceptionally(t);
+                            } else {
+                                closeFuture.complete(null);
+                            }
+                        });
+                    }
+                });
+
+                return closeFuture;
             } else {
                 return CompletableFuture.completedFuture(null);
             }
